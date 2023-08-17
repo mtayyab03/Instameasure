@@ -30,7 +30,10 @@ function AdminDashboard() {
         .collection("users")
         .where("approvalStatus", "==", "pending")
         .get();
-      const requests = snapshot.docs.map((doc) => doc.data());
+      const requests = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setPendingRequests(requests);
     };
 
@@ -41,44 +44,38 @@ function AdminDashboard() {
     console.log("Approve button clicked");
 
     if (selectedItem) {
-      console.log("Selected user ID:", selectedItem.userId);
+      const userId = selectedItem.id; // Access the document ID directly
+      console.log("Selected user ID:", userId);
 
       // Update user's approval status in the database
       try {
         await db
           .collection("users")
-          .doc(selectedItem.userId)
+          .doc(userId) // Use the document ID
           .update({ approvalStatus: "approved" });
 
-        console.log("Request approved:", selectedItem.userId);
+        console.log("Request approved:", userId);
 
         // Send a notification to the user
-        sendNotification(
-          selectedItem.userId,
-          "Your request has been approved."
-        );
       } catch (error) {
         console.error("Error updating approval status:", error);
       }
     }
   };
 
-  const handleReject = async () => {
+  const handleReject = async (selectedItem) => {
     console.log("Reject button clicked");
-    if (selectedRequest) {
-      // Update user's approval status in the database
+    if (selectedItem) {
+      const userId = selectedItem.id; // Access the document ID directly
+      console.log("Selected user ID:", userId);
       await db
         .collection("users")
-        .doc(selectedRequest.userId)
+        .doc(userId) // Use the document ID
         .update({ approvalStatus: "rejected" });
 
       // Send a notification to the user
-      sendNotification(
-        selectedRequest.userId,
-        "Your request has been rejected."
-      );
 
-      console.log("Request rejected:", selectedRequest.userId);
+      console.log("Request rejected:", userId);
     }
   };
   // Render pending requests in a FlatList
@@ -126,7 +123,7 @@ function AdminDashboard() {
           {/* Display user details here */}
           <TouchableOpacity
             onPress={() => {
-              console.log("Selected user ID:", item.userId); // Check if item.userId is defined
+              console.log("Selected user ID:", item.id);
               handleApprove(item);
             }}
             style={{
@@ -152,8 +149,8 @@ function AdminDashboard() {
 
           <TouchableOpacity
             onPress={() => {
-              setSelectedRequest(item); // Update selectedRequest
-              handleReject();
+              console.log("Selected user ID:", item.id);
+              handleReject(item);
             }}
             style={{
               width: RFPercentage(8),
@@ -208,7 +205,7 @@ function AdminDashboard() {
       <FlatList
         data={pendingRequests}
         renderItem={renderItem}
-        keyExtractor={(item) => item.userId} // Use user ID as the key
+        keyExtractor={(item) => item.id} // Use user ID as the key
       />
     </View>
   );
