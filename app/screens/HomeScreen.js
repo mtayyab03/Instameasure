@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useRoute } from "@react-navigation/native";
 import axios from "axios";
 import {
   Image,
-  FlatList,
   TouchableOpacity,
   StyleSheet,
   View,
   Text,
   TextInput,
   ScrollView,
-  VirtualizedList,
 } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
-
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { db } from "../../config";
 
 //Components
 import Screen from "../components/Screen";
@@ -24,6 +22,9 @@ import Colors from "../config/Colors";
 import { FontFamily } from "../config/font";
 
 export default function HomeScreen() {
+  const route = useRoute();
+  const userId = route.params?.userId || null;
+  const initialApiHitCount = route.params?.apiHitCount || 0;
   const [Street, onChangeStreet] = useState("");
   const [Suite, onChangeSuite] = useState("");
   const [City, onChangeCity] = useState("");
@@ -31,7 +32,7 @@ export default function HomeScreen() {
   const [Zip, onChangeZip] = useState("");
   const [Pitch, onChangePitch] = useState("");
   const [Areasqft, onChangeAreasqft] = useState("");
-  const [PricePerSquare, onChangePricePerSquare] = useState("");
+  const [loading, setLoading] = useState(false);
   const [ModeSlope, setModeSlope] = useState(""); // To store ModeSlope from API response
   const [Area_SqFt, setArea_SqFt] = useState(""); // To store Area_SqFt from API response
   const [degreeMultiplier, setDegreeMultiplier] = useState(1);
@@ -39,8 +40,10 @@ export default function HomeScreen() {
   const [pricePerSqFt, setPricePerSqFt] = useState("");
   const [totalPrice, setTotalPrice] = useState("");
   const [degmenuid, setdegmenuid] = useState(0);
-
   const [Wastemenuid, setWastemenuid] = useState(0);
+  const [apiHits, setApiHitCount] = useState(initialApiHitCount);
+  // Change the initial count as needed
+  const [isApiHitExhausted, setIsApiHitExhausted] = useState(false);
 
   const degreeList = [
     {
@@ -84,27 +87,53 @@ export default function HomeScreen() {
     },
   ];
 
-  const handleGetButtonClick = () => {
-    const completeAddress = `${Street} ${Suite}, ${City} ${State} ${Zip}`;
+  const handleGetButtonClick = async () => {
+    if (apiHits > 0 && !loading) {
+      setLoading(true);
 
-    const apiUrl = `https://api.buildings.earthdefine.com/v1/buildings?address=${encodeURIComponent(
-      completeAddress
-    )}&token=bf310fb2-1273-4065-81fd-591cf7e60dc0`;
+      try {
+        const completeAddress = `${Street} ${Suite}, ${City} ${State} ${Zip}`;
+        const apiUrl = `https://api.buildings.earthdefine.com/v1/buildings?address=${encodeURIComponent(
+          completeAddress
+        )}&token=bf310fb2-1273-4065-81fd-591cf7e60dc0`;
 
-    axios
-      .get(apiUrl)
-      .then((response) => {
+        const response = await axios.get(apiUrl);
         const data = response.data;
+
         if (data && data.length > 0) {
           const firstBuilding = data[0];
           setModeSlope(firstBuilding.ModeSlope);
           setArea_SqFt(firstBuilding.Area_SqFt);
+
+          // Decrement the API hit count here, after the API call is successful
+          setApiHitCount(apiHits - 1);
+
+          // Update the API hit count in Firebase
+          await db
+            .collection("users")
+            .doc(userId)
+            .update({
+              apiHits: apiHits - 1,
+            });
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching API data:", error);
-      });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setIsApiHitExhausted(true);
+      if (apiHits === 0) {
+        alert(
+          "Your API hits are exhausted. Please contact the admin for more."
+        );
+      }
+    }
   };
+  useEffect(() => {
+    if (isApiHitExhausted) {
+    }
+  }, [isApiHitExhausted]);
 
   useEffect(() => {
     // Update the Degree/Pitch and Area square ft fields
@@ -315,8 +344,12 @@ export default function HomeScreen() {
           onPress={handleGetButtonClick}
           style={styles.loginbutton}
           activeOpacity={0.7}
+          disabled={apiHits === 0} // Disable the button if apiHitCount is 0
         >
-          <AppButton title="Get" buttonColor={Colors.pink} />
+          <AppButton
+            title={`Get (${apiHits} left)`} // Display remaining API hit count
+            buttonColor={Colors.pink}
+          />
         </TouchableOpacity>
 
         {/* degree text */}

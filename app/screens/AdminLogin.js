@@ -22,7 +22,7 @@ const AdminLogin = ({ navigation }) => {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    if (email === "Tayyab@gmail.com" && password === "123456") {
+    if (email === "christopher@joinomm.com" && password === "291Km909") {
       // Navigate to the admin panel or dashboard
       navigation.navigate("AdminDashboard"); // Replace 'AdminDashboard' with the actual screen name
     } else {

@@ -168,8 +168,6 @@ export default function SignUpScreen(props) {
           </Text>
         </View>
       </TouchableOpacity>
-      {/* Error message */}
-      {error ? <Text style={styles.error}>{error}</Text> : null}
     </Screen>
   );
 }

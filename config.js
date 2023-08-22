@@ -8,12 +8,12 @@ import "firebase/compat/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB6QKj1Vw6ZwSFfVizIOHTXvF_junfX8dU",
-  authDomain: "instameasure-e072e.firebaseapp.com",
-  projectId: "instameasure-e072e",
-  storageBucket: "instameasure-e072e.appspot.com",
-  messagingSenderId: "1087565029285",
-  appId: "1:1087565029285:web:736696284f64e651dd124c",
+  apiKey: "AIzaSyBWfK6e-DQtLU10GaHe51S7Hb_OBZqVhew",
+  authDomain: "instameasure-app.firebaseapp.com",
+  projectId: "instameasure-app",
+  storageBucket: "instameasure-app.appspot.com",
+  messagingSenderId: "910644309980",
+  appId: "1:910644309980:web:fdc0c882f4bff67332a919",
 };
 
 firebase.initializeApp(firebaseConfig);

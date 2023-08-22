@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Image,
-  KeyboardAvoidingView,
   TouchableOpacity,
   StyleSheet,
   View,
@@ -44,7 +43,10 @@ export default function LoginScreen(props) {
         const userData = userSnapshot.data();
         console.log("User Data:", userData);
         if (userData.approvalStatus === "approved") {
-          navigation.replace("HomeScreen");
+          navigation.replace("HomeScreen", {
+            userId: user.uid,
+            apiHitCount: userData.apiHits,
+          });
         } else {
           console.log("User approval status:", userData.approvalStatus);
           console.log("Your signup request is still pending approval.");
@@ -64,7 +66,7 @@ export default function LoginScreen(props) {
         style={{
           position: "absolute",
           right: RFPercentage(4),
-          marginTop: RFPercentage(8),
+          marginTop: RFPercentage(7),
         }}
       >
         <TouchableOpacity

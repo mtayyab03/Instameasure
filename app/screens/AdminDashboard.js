@@ -6,20 +6,17 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-  Button,
+  TextInput,
 } from "react-native";
 import { db } from "../../config"; // Import your Firebase configuration
 import { RFPercentage } from "react-native-responsive-fontsize";
-
-//Components
-import Screen from "../components/Screen";
-import AppButton from "../components/AppButton";
 
 //config
 import Colors from "../config/Colors";
 import { FontFamily } from "../config/font";
 
 function AdminDashboard() {
+  const [apiNumber, onChangeApiNumber] = useState("");
   const [pendingRequests, setPendingRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
 
@@ -49,14 +46,12 @@ function AdminDashboard() {
 
       // Update user's approval status in the database
       try {
-        await db
-          .collection("users")
-          .doc(userId) // Use the document ID
-          .update({ approvalStatus: "approved" });
+        await db.collection("users").doc(userId).update({
+          approvalStatus: "approved",
+          apiHits: apiNumber, // Set the assigned API hits value
+        });
 
         console.log("Request approved:", userId);
-
-        // Send a notification to the user
       } catch (error) {
         console.error("Error updating approval status:", error);
       }
@@ -111,6 +106,22 @@ function AdminDashboard() {
           >
             {item.name}
           </Text>
+
+          {/* //company name input */}
+          <View style={{ marginTop: RFPercentage(1.3) }} />
+          <View style={styles.emailmain}>
+            <TextInput
+              style={{
+                fontSize: RFPercentage(1.5),
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onChangeText={onChangeApiNumber}
+              value={item.apiNumber}
+              placeholder="Measuremets"
+              placeholderTextColor={Colors.placeholder}
+            />
+          </View>
           {/* Use item.email instead of item.name */}
         </View>
         <View
@@ -223,5 +234,17 @@ const styles = StyleSheet.create({
     height: RFPercentage(5),
     position: "absolute",
     bottom: RFPercentage(2),
+  },
+  emailmain: {
+    width: RFPercentage(12),
+    height: RFPercentage(4),
+    backgroundColor: Colors.white,
+    borderWidth: RFPercentage(0.1),
+    borderColor: Colors.lightWhite,
+    color: Colors.blacky,
+    paddingHorizontal: RFPercentage(1),
+    borderRadius: RFPercentage(1.5),
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
