@@ -14,7 +14,6 @@ import { RFPercentage } from "react-native-responsive-fontsize";
 import { db } from "../../config";
 
 //Components
-import Screen from "../components/Screen";
 import AppButton from "../components/AppButton";
 
 //config

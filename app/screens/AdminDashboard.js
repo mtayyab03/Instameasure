@@ -18,7 +18,6 @@ import { FontFamily } from "../config/font";
 function AdminDashboard() {
   const [apiNumber, onChangeApiNumber] = useState("");
   const [pendingRequests, setPendingRequests] = useState([]);
-  const [selectedRequest, setSelectedRequest] = useState(null);
 
   useEffect(() => {
     // Fetch pending requests from Firestore
