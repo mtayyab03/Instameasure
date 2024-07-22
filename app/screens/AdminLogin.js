@@ -9,6 +9,7 @@ import {
   Image,
 } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
+
 //config
 import Colors from "../config/Colors";
 import { FontFamily } from "../config/font";

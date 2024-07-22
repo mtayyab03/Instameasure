@@ -6,6 +6,7 @@ import {
   View,
   Text,
   TextInput,
+  Alert,
 } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
 import { Formik } from "formik";
@@ -57,7 +58,22 @@ export default function LoginScreen(props) {
       }
     } catch (error) {
       console.error(error);
-      // Handle error (display error message, etc.)
+      if (error.code === "auth/user-not-found") {
+        Alert.alert(
+          "Invalid Credentials",
+          "Please use a valid email or password.",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          { cancelable: false }
+        );
+      } else {
+        // Handle other errors (display a generic error message)
+        Alert.alert(
+          "Error",
+          "An error occurred. Please try again later.",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          { cancelable: false }
+        );
+      }
     }
   };
   return (

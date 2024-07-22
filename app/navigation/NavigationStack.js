@@ -10,6 +10,7 @@ import SignUpScreen from "../screens/SignUpScreen";
 import HomeScreen from "../screens/HomeScreen";
 import AdminLogin from "../screens/AdminLogin";
 import AdminDashboard from "../screens/AdminDashboard";
+import ApprovedScreen from "../screens/ApprovedScreen";
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ export default function NavigationStack() {
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="AdminLogin" component={AdminLogin} />
       <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
+      <Stack.Screen name="ApprovedScreen" component={ApprovedScreen} />
 
       <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
       <Stack.Screen name="HomeScreen" component={HomeScreen} />

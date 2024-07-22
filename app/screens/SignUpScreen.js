@@ -28,40 +28,59 @@ export default function SignUpScreen(props) {
 
   const handleSignup = async () => {
     if (!company || !email || !Password) {
-      // Change Name to email
       setError("Please fill in all fields.");
       return;
     }
 
     try {
-      const userCredential = await auth.createUserWithEmailAndPassword(
-        email, // Change Name to email
-        Password
-      );
-      const user = userCredential.user;
+      const existingUserSnapshot = await db
+        .collection("users")
+        .where("name", "==", email)
+        .get();
 
-      // Save additional user data to Firebase Firestore with pending approval status
-      await db.collection("users").doc(user.uid).set({
-        company: company,
-        name: email, // Change Name to email
-        approvalStatus: "pending",
-      });
+      if (existingUserSnapshot.size > 0) {
+        // User with the same email already exists in Firestore
+        // Update the approvalStatus to "pending" and accountStatus to "active"
+        const userDoc = existingUserSnapshot.docs[0];
+        await userDoc.ref.update({
+          approvalStatus: "pending",
+          accountStatus: "active",
+          company: company, // Update the company name if needed
+        });
 
-      // Display an alert to inform the user that their request has been sent for approval
-      Alert.alert(
-        "Request Sent",
-        "Your signup request has been sent for approval by the admin."
-      );
+        Alert.alert(
+          "Request Sent",
+          "Your registration request has been sent for approval by the admin."
+        );
+      } else {
+        // User does not exist, proceed with creating a new user
+        const userCredential = await auth.createUserWithEmailAndPassword(
+          email,
+          Password
+        );
+        const user = userCredential.user;
 
-      // Clear the form fields
+        // Save user data with pending approval status and active account status
+        await db.collection("users").doc(user.uid).set({
+          company: company,
+          name: email,
+          approvalStatus: "pending",
+          accountStatus: "active",
+        });
+
+        Alert.alert(
+          "Request Sent",
+          "Your signup request has been sent for approval by the admin."
+        );
+      }
+
       onChangeCompany("");
-      onChangeEmail(""); // Change onChangeName to onChangeEmail
+      onChangeEmail("");
       onChangePassword("");
     } catch (error) {
       setError(error.message);
     }
   };
-
   return (
     <Screen style={styles.screen}>
       <View style={styles.logocontainer}>
@@ -155,7 +174,7 @@ export default function SignUpScreen(props) {
               fontSize: RFPercentage(2),
             }}
           >
-            Don’t have a account ?
+            Don’t have an account?
           </Text>
           <Text
             style={{
